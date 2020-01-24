@@ -1,4 +1,7 @@
 # Simple Kotlin https://localise.biz/ API client
+[![Build Status](https://travis-ci.org/npwork/kotlin-localise.svg?branch=master)](https://travis-ci.org/npwork/kotlin-localise)
+[![Apache License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+
 ----
 All Translations are in Properties format and **load once**
 
