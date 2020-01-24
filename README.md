@@ -29,3 +29,20 @@ val i18n = client.translations("en")
 println(i18n.t("my.another"))
 ```
  
+
+## How to add?
+Add https://jitpack.io/ repository
+
+#### Maven
+```xml
+<dependency>
+    <groupId>com.github.npwork</groupId>
+    <artifactId>kotlin-localise</artifactId>
+    <version>-SNAPSHOT</version>
+</dependency>
+```
+
+#### Gradle
+```groovy
+implementation 'com.github.npwork:kotlin-localise:-SNAPSHOT'
+```
