@@ -1,0 +1,6 @@
+[*.{kt,kts}]
+
+charset=utf-8
+
+indent_size=unset
+disabled_rules=no-wildcard-imports,import-ordering
