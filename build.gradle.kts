@@ -12,6 +12,7 @@ plugins {
     id("com.star-zero.gradle.githook") version "1.2.0"
 
     jacoco
+    maven
 }
 
 val mainClass: String by project
