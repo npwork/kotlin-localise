@@ -43,6 +43,7 @@ dependencies {
     // Test dependencies
     testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
     testImplementation("org.assertj:assertj-core:3.14.0")
+    testImplementation("io.mockk:mockk:1.9.3")
 }
 
 detekt {
