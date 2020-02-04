@@ -1,11 +1,11 @@
 package com.npwork.localise
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.github.wnameless.json.flattener.JsonFlattener
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
 import com.google.common.hash.Hashing
 import com.npwork.localise.api.ApiService
 import com.npwork.localise.model.auth.AuthVerify
@@ -20,33 +20,39 @@ import javax.ws.rs.HeaderParam
 
 class LocoClient(
         val apiKey: String,
-        val cacheFile: String? = null,
-        val cacheDuration: Long = 10,
-        val cacheUnit: TimeUnit = TimeUnit.MINUTES
+        val cacheConfig: CacheConfig? = null
 ) {
     private val config = ClientConfig().also {
         it.add(HeaderParam::class.java, "Authorization", "Loco $apiKey")
         it.jacksonConfigureListener = JacksonConfigureListener { objectMapper -> objectMapper!!.registerModules(KotlinModule()) }
     }
 
-    internal var apiService: ApiService = RestProxyFactory.createProxy(ApiService::class.java, "https://localise.biz", config)
+    internal var apiService: ApiService = RestProxyFactory.createProxy(ApiService::class.java, URL, config)
 
-    private val cache = CacheBuilder.newBuilder()
-            .expireAfterWrite(cacheDuration, cacheUnit)
-            .build(object : CacheLoader<String, TranslationsResponse>() {
-                override fun load(key: String) = loadAllTranslations()
-            })
+    private val cache: LoadingCache<String, TranslationsResponse>
+
+    init {
+        val builder = CacheBuilder.newBuilder()
+        if (cacheConfig != null)
+            builder.expireAfterWrite(cacheConfig.duration * cacheConfig.unit.duration.toMillis(), TimeUnit.MILLISECONDS)
+
+        cache = builder.build(object : CacheLoader<String, TranslationsResponse>() {
+            override fun load(key: String) = loadAllTranslations()
+        })
+    }
 
     fun translations(lang: String = "en"): I18NService = I18NService(cache.get(apiKey).all, lang)
 
-    data class Response(val asString: String, val asJson: JsonNode)
-
     private fun loadAllTranslations(): TranslationsResponse {
-        var data = FileCacheService.tryReadFromFile(cacheFile)
+        var data: Pair<String, JsonNode>? = null
+
+        if (cacheConfig != null) {
+            data = FileCacheService.tryReadFromFile(cacheConfig)
+        }
+
         if (data == null) {
             data = getTranslations()
-
-            FileCacheService.saveToFile(cacheFile, data!!.first)
+            FileCacheService.saveToFile(cacheConfig, data!!.first)
         }
 
         val responseHash = Hashing.sha256()
@@ -61,8 +67,8 @@ class LocoClient(
 
     private fun getTranslations(): Pair<String, JsonNode>? {
         val resp = apiService.translations()
-        val responseAsString = mapper.writeValueAsString(resp)
-        return Pair(responseAsString, mapper.readTree(responseAsString))
+        val responseAsString = objectMapper.writeValueAsString(resp)
+        return Pair(responseAsString, objectMapper.readTree(responseAsString))
     }
 
     @Suppress("TooGenericExceptionCaught")
@@ -75,6 +81,6 @@ class LocoClient(
     }
 
     companion object {
-        val mapper = ObjectMapper().registerModules(KotlinModule())
+        const val URL = "https://localise.biz"
     }
 }

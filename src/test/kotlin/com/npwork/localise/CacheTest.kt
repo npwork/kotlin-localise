@@ -5,7 +5,7 @@ import io.mockk.spyk
 import io.mockk.verify
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import java.util.concurrent.TimeUnit
+import java.time.temporal.ChronoUnit
 
 class CacheTest {
     @Test
@@ -26,7 +26,8 @@ class CacheTest {
     @Test
     @DisplayName("Fetches after cache time")
     fun afterCacheTime() {
-        val client = LocoClient(apiKey = TestProps.TEST_API_KEY, cacheDuration = 0, cacheUnit = TimeUnit.NANOSECONDS)
+        val filePath = "${System.getProperty("java.io.tmpdir")}${System.currentTimeMillis()}"
+        val client = LocoClient(apiKey = TestProps.TEST_API_KEY, cacheConfig = CacheConfig(file = filePath, duration = 0, unit = ChronoUnit.NANOS))
         val spy = spyk(client.apiService)
         client.apiService = spy
 

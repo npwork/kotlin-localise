@@ -12,7 +12,7 @@ class FileCacheTest {
     @DisplayName("Saves to file after request")
     fun saveToFile() {
         val filePath = "${getProperty("java.io.tmpdir")}${currentTimeMillis()}"
-        val client = LocoClient(TestProps.TEST_API_KEY, cacheFile = filePath)
+        val client = LocoClient(TestProps.TEST_API_KEY, cacheConfig = CacheConfig(filePath))
         client.translations("en")
 
         checkFileContent(filePath)
@@ -24,7 +24,7 @@ class FileCacheTest {
         val filePath = "${getProperty("java.io.tmpdir")}${currentTimeMillis()}"
         File(filePath).createNewFile()
 
-        val client = LocoClient(TestProps.TEST_API_KEY, cacheFile = filePath)
+        val client = LocoClient(TestProps.TEST_API_KEY, cacheConfig = CacheConfig(filePath))
         client.translations("en")
 
         checkFileContent(filePath)
@@ -36,7 +36,7 @@ class FileCacheTest {
         val filePath = "${getProperty("java.io.tmpdir")}${currentTimeMillis()}"
         File(filePath).writeText("hello world")
 
-        val client = LocoClient(TestProps.TEST_API_KEY, cacheFile = filePath)
+        val client = LocoClient(TestProps.TEST_API_KEY, cacheConfig = CacheConfig(filePath))
         client.translations("en")
 
         checkFileContent(filePath)

@@ -539,7 +539,7 @@ style:
     active: false
   ReturnCount:
     active: true
-    max: 3
+    max: 4
     excludedFunctions: "equals"
     excludeLabeled: false
     excludeReturnFromLambda: true
